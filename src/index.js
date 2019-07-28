@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import 'bootstrap-material-design/dist/css/bootstrap-material-design.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 

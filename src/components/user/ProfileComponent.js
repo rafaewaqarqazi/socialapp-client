@@ -37,7 +37,6 @@ class ProfileComponent extends Component {
         const token = isAuthenticated().token;
         callApi(userId, token, this.state.user._id)
             .then(data => {
-                console.log(data);
                 if (data.error){
                     this.setState({error:data.error})
                 }

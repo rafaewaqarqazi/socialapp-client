@@ -1,37 +1,35 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {follow, unFollow} from './apiUser';
-class FollowProfileButton extends Component {
+const FollowProfileButton = props=> {
 
-    followClick = ()=>{
-        this.props.onButtonClick(follow)
+    const followClick = ()=>{
+        props.onButtonClick(follow)
     };
 
-    unFollowClick =()=>{
-        this.props.onButtonClick(unFollow)
+    const unFollowClick =()=>{
+        props.onButtonClick(unFollow)
     };
-    render() {
-        return (
-            <div className='d-inline-block '>
-                {
-                    !this.props.following?(
-                        <button
-                            className="btn btn-success btn-raised mr-5"
-                            onClick={this.followClick}
-                        >
-                            Follow
-                        </button>
-                    ):(
-                        <button
-                            className="btn btn-danger btn-raised "
-                            onClick={this.unFollowClick}
-                        >
-                            UnFollow
-                        </button>
-                    )
-                }
-            </div>
-        );
-    }
-}
+    return (
+        <div className='d-inline-block '>
+            {
+                !props.following?(
+                    <button
+                        className="btn btn-success btn-raised mr-5"
+                        onClick={followClick}
+                    >
+                        Follow
+                    </button>
+                ):(
+                    <button
+                        className="btn btn-danger btn-raised "
+                        onClick={unFollowClick}
+                    >
+                        UnFollow
+                    </button>
+                )
+            }
+        </div>
+    );
+};
 
 export default FollowProfileButton;

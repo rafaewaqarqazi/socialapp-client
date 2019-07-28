@@ -1,22 +1,17 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {findPeople, follow} from './apiUser';
 import {Link} from "react-router-dom";
 import DefaultProfile from '../../images/userAvatar.jpg';
 import {isAuthenticated} from "../../auth";
 
-class FindPeople extends Component {
+const FindPeople = props => {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            users:[],
-            error:'',
-            open:false,
-            followMessage:''
-        };
-    }
+    const [users,setUsers]=useState([]);
+    const [error,setError] = useState('');
+    const [open, setOpen] = useState(false);
+    const [followMessage,setFollowMessage] = useState('');
 
-    componentDidMount() {
+    useEffect(()=>{
         const userId = isAuthenticated().user._id;
         const token = isAuthenticated().token;
         findPeople(userId,  token).then(data => {
@@ -24,32 +19,30 @@ class FindPeople extends Component {
                 console.log(data.error)
             }
             else {
-                this.setState({users:data})
+                setUsers(data);
             }
         })
-    }
+    },[]);
 
-    clickFollow = (user, i)=>{
+    const clickFollow = (user, i)=>{
         const userId = isAuthenticated().user._id;
         const token = isAuthenticated().token;
         follow(userId, token, user._id)
             .then(data => {
                 if (data.error){
-                    this.setState({error:data.error})
+                    setError(data.error);
                 }
                 else {
-                    let toFollow = this.state.users;
+                    let toFollow = users;
                     toFollow.splice(i,1);
-                    this.setState({
-                        users:toFollow,
-                        open:true,
-                        followMessage:`Following ${user.name}`
-                    })
+                    setUsers(toFollow);
+                    setOpen(true);
+                    setFollowMessage(`Following ${user.name}`);
                 }
             })
     };
 
-    renderUsers = users =>(
+    const renderUsers = users =>(
         <div className='row'>
             {users.map((user, i)=>(
 
@@ -68,7 +61,7 @@ class FindPeople extends Component {
                         >
                             View Profile
                         </Link>
-                        <button onClick={()=>this.clickFollow(user,i)}
+                        <button onClick={()=>clickFollow(user,i)}
                             className="btn btn-raised btn-info float-right btn-sm"
                         >
                             Follow
@@ -79,24 +72,22 @@ class FindPeople extends Component {
         </div>
     );
 
-    render() {
-        const {users, open, followMessage} = this.state;
-        return (
-            <div>
-                <div className='card mb-4'>
-                    <h3 className='m-auto p-3 text-muted'>Users</h3>
-                </div>
-                {
-                    open &&
-                        <div className='alert alert-success'>
-                            <p>{followMessage}</p>
-                        </div>
-                }
-                {this.renderUsers(users)}
+    return (
+        <div>
+            <div className='card mb-4'>
+                <h3 className='m-auto p-3 text-muted'>Users</h3>
             </div>
+            {
+                open &&
+                    <div className='alert alert-success'>
+                        <p>{followMessage}</p>
+                    </div>
+            }
+            {renderUsers(users)}
+        </div>
 
-        );
-    }
-}
+    );
+
+};
 
 export default FindPeople;

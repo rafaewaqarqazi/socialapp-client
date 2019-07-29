@@ -50,7 +50,6 @@ const ProfileComponent = props=> {
                     setRedirectToSignIn(true);
                 }else
                 {
-                    console.log('init');
                     let following = checkFollow(data);
                     setUser(data);
                     setFollowing(following);
@@ -76,7 +75,6 @@ const ProfileComponent = props=> {
     };
 
     useEffect(()=>{
-        console.log('useEffect');
         const userId = props.match.params.userId;
         init(userId);
     },[props.match.params.userId]);

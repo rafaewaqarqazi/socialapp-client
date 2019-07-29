@@ -1,7 +1,8 @@
 ## SocialApp Client
-A simple socialApp Client built in react following [Kaloraat's](https://github.com/kaloraat) Tutorials.
+A simple socialApp Client built in react following [Kaloraat's](https://github.com/kaloraat) Tutorials, **And updated it to use React Hooks**.
 Users can: 
     SignUp, Create new post, like posts, comment on posts, and follow other users. 
+    
 
 ## Available Scripts
 

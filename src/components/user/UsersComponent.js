@@ -1,28 +1,25 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {list} from './apiUser';
 import {Link} from "react-router-dom";
 import DefaultProfile from '../../images/userAvatar.jpg';
-class UsersComponent extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            users:[]
-        };
-    }
+const UsersComponent = props => {
 
-    componentDidMount() {
+    const [users, setUsers] = useState([]);
+
+    useEffect(()=>{
         list().then(data => {
             if (data.error){
                 console.log(data.error)
             }
             else {
-                this.setState({users:data})
+                setUsers(data);
             }
         })
-    }
+    },[]);
 
-    renderUsers = users =>(
+
+    const renderUsers = users =>(
         <div className='row'>
             {users.map((user, i)=>(
 
@@ -43,18 +40,16 @@ class UsersComponent extends Component {
         </div>
     );
 
-    render() {
-        const {users} = this.state;
-        return (
-            <div>
-                <div className='card mb-4'>
-                    <h3 className='m-auto p-3 text-muted'>Users</h3>
-                </div>
-                {this.renderUsers(users)}
+    return (
+        <div>
+            <div className='card mb-4'>
+                <h3 className='m-auto p-3 text-muted'>Users</h3>
             </div>
+            {renderUsers(users)}
+        </div>
 
-        );
-    }
-}
+    );
+
+};
 
 export default UsersComponent;

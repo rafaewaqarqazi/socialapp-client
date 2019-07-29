@@ -1,30 +1,28 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 import {Redirect, Link} from 'react-router-dom';
 import {signin, authenticate} from '../../auth';
 
-class SignInComponent extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            email:'',
-            password:'',
-            error:'',
-            redirectToReferer:false,
-            loading:false
-        };
-    }
+const SignInComponent = props=> {
+    const [state, setState] = useState({
+        email:'',
+        password:'',
+        error:'',
+        redirectToReferer:false,
+        loading:false
+    });
 
-    handleChange = name => event =>{
-        this.setState({error:''});
-        this.setState({
+    const handleChange = name => event =>{
+        setState({...state,error:''});
+        setState({
+            ...state,
             [name]:event.target.value
         })
     };
 
-    clickSubmit = event =>{
+    const clickSubmit = event =>{
         event.preventDefault();
-        this.setState({loading:true});
-        const {email, password} = this.state;
+        setState({...state,loading:true});
+        const {email, password} = state;
 
         const user = {
             email,
@@ -34,10 +32,10 @@ class SignInComponent extends Component {
             .then(data =>{
 
                 if (data.error)
-                    this.setState({error:data.error,loading:false})
+                    setState({...state,error:data.error,loading:false});
                 else{
                     authenticate(data, ()=>{
-                        this.setState({redirectToReferer:true})
+                        setState({...state,redirectToReferer:true})
                     })
                 }
 
@@ -47,12 +45,12 @@ class SignInComponent extends Component {
 
 
 
-    signinForm = (email, password)=>{
+    const signinForm = (email, password)=>{
         return  <form>
             <div className='form-group'>
                 <label className='text-muted'>Email</label>
                 <input
-                    onChange={this.handleChange("email")}
+                    onChange={handleChange("email")}
                     type="email"
                     className="form-control"
                     placeholder='someone@example.com'
@@ -62,7 +60,7 @@ class SignInComponent extends Component {
             <div className='form-group'>
                 <label className='text-muted'>Password</label>
                 <input
-                    onChange={this.handleChange("password")}
+                    onChange={handleChange("password")}
                     type="password"
                     className="form-control"
                     value={password}
@@ -70,7 +68,7 @@ class SignInComponent extends Component {
             </div>
 
             <button
-                onClick={this.clickSubmit}
+                onClick={clickSubmit}
                 className="btn btn-raised btn-primary"
             >
                 Submit
@@ -78,42 +76,41 @@ class SignInComponent extends Component {
         </form>
     };
 
-    render() {
-        const {email, password,error, redirectToReferer, loading} = this.state;
 
-        if (redirectToReferer){
-            return <Redirect to='/'/>
-        }
-        return (
+    const {email, password,error, redirectToReferer, loading} = state;
 
-            <div className='container mt-5'>
-                <div className="card w-75 m-auto">
-                    <h2 className='card-header text-center text-muted'>Sign In</h2>
+    if (redirectToReferer){
+        return <Redirect to='/'/>
+    }
+    return (
 
-                    <div className="card-body">
-                        <div className="alert alert-danger"
-                             style={{display: error?"":"none"}}
-                        >
-                            {error}
-                        </div>
+        <div className='container mt-5'>
+            <div className="card w-75 m-auto">
+                <h2 className='card-header text-center text-muted'>Sign In</h2>
 
-                        {loading ? <div className='jumbotron text-center'>
-                            <h2>Loading...</h2>
-                        </div>:""}
-                        {this.signinForm(email, password)}
-                        <p>
-                            <Link to="/forgot-password" className="text-danger">
-                                {" "}
-                                Forgot Password
-                            </Link>
-                        </p>
+                <div className="card-body">
+                    <div className="alert alert-danger"
+                         style={{display: error?"":"none"}}
+                    >
+                        {error}
                     </div>
 
+                    {loading ? <div className='jumbotron text-center'>
+                        <h2>Loading...</h2>
+                    </div>:""}
+                    {signinForm(email, password)}
+                    <p>
+                        <Link to="/forgot-password" className="text-danger">
+                            {" "}
+                            Forgot Password
+                        </Link>
+                    </p>
                 </div>
-            </div>
 
-        );
-    }
-}
+            </div>
+        </div>
+
+    );
+};
 
 export default SignInComponent;

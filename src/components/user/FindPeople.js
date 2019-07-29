@@ -7,7 +7,7 @@ import {isAuthenticated} from "../../auth";
 const FindPeople = props => {
 
     const [users,setUsers]=useState([]);
-    const [error,setError] = useState('');
+    const [,setError] = useState('');
     const [open, setOpen] = useState(false);
     const [followMessage,setFollowMessage] = useState('');
 

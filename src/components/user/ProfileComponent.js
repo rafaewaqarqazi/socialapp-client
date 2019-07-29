@@ -16,7 +16,7 @@ const ProfileComponent = props=> {
     const [posts, setPosts] = useState([]);
     const [redirectToSignIn, setRedirectToSignIn] = useState(false);
     const [following, setFollowing] = useState(false);
-    const [error, setError] = useState('');
+    const [, setError] = useState('');
 
     const checkFollow = user=>{
         const jwt = isAuthenticated();

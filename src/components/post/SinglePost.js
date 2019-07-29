@@ -1,47 +1,47 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {singlePost, remove,like,unlike} from "./apiPost";
 import DefaultPost from "../../images/defaultPost.jpg";
 import {Link, Redirect} from "react-router-dom";
 import {isAuthenticated} from "../../auth";
 import Comment from './Comment';
-class SinglePost extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            post:{},
-            deleted:false,
-            like:false,
-            likes:0,
-            redirectToSignin:false,
-            comments:[]
-        };
-    }
+const SinglePost =props=> {
 
-    checkLike=likes=>{
+    const [state,setState] = useState({
+        post:{},
+        deleted:false,
+        like:false,
+        likes:0,
+        redirectToSignin:false,
+        comments:[]
+    });
+
+    const checkLike=likes=>{
       const userId = isAuthenticated() && isAuthenticated().user._id;
       let match = likes.indexOf(userId) !== -1;
       return match;
     };
-    componentDidMount() {
-        const postId = this.props.match.params.postId;
+
+    useEffect(()=>{
+        const postId = props.match.params.postId;
         singlePost(postId)
             .then(data =>{
                 if (data.error){
                     console.log(data.error);
                 }else {
-                    this.setState({
+                    setState({
+                        ...state,
                         post:data,
                         likes:data.likes.length,
-                        like:this.checkLike(data.likes),
+                        like:checkLike(data.likes),
                         comments:data.comments
                     })
                 }
             } )
-    }
+    },[props.match.params.postId]);
 
-    deletePost = ()=>{
-        const postId = this.props.match.params.postId;
+    const deletePost = ()=>{
+        const postId = props.match.params.postId;
         const token = isAuthenticated().token;
 
         remove(postId, token)
@@ -50,51 +50,50 @@ class SinglePost extends Component {
                     console.log(data.error)
                 }
                 else {
-                    this.setState({deleted:true})
+                    setState({...state,deleted:true})
                 }
             })
     };
 
-    deleteConfirmed = ()=>{
+    const deleteConfirmed = ()=>{
         let answer = window.confirm("Are you sure you want to Delete your Post");
         if (answer){
-            this.deletePost();
+            deletePost();
         }
     };
 
-    updateComments = comments =>{
-        this.setState({comments})
+    const updateComments = comments =>{
+        setState({...state,comments})
     };
 
-    likeToggle = ()=>{
+    const likeToggle = ()=>{
         if(!isAuthenticated()){
-            this.setState({redirectToSignin:true});
+            setState({...state,redirectToSignin:true});
             return false
         }
-      let callApi = this.state.like ? unlike : like ;
+      let callApi = state.like ? unlike : like ;
       const userId = isAuthenticated().user._id;
-      const postId = this.state.post._id;
+      const postId = state.post._id;
       const token = isAuthenticated().token;
       callApi(userId, token, postId).then(data => {
           if (data.error){
               console.log(data.error)
           }
           else {
-              this.setState({
-                  like: !this.state.like,
+              setState({
+                  ...state,
+                  like: !state.like,
                   likes: data.likes.length
               })
           }
       })
     };
-    renderPost  = post => {
+    const renderPost  = post => {
         const posterId = post.postedBy ? `/user/${post.postedBy._id}`:'';
         const posterName = post.postedBy? post.postedBy.name:'Unknown';
         const postedBy = post.postedBy ? `${post.postedBy._id}` : '';
-        const {like, likes} = this.state;
+        const {like, likes} = state;
         return (
-
-
                 <div >
                     <img
                         className='img-thumbnail mb-3'
@@ -105,14 +104,14 @@ class SinglePost extends Component {
                     />
                     <div>
                         {like ?(
-                            <h3 onClick={this.likeToggle}>
+                            <h3 onClick={likeToggle}>
                                 <i className="fa fa-thumbs-up bg-dark text-success"
                                    style={{padding:"10px", borderRadius:"50%"}}
                                 />
                                 {`${likes} Likes`}
                             </h3>
                         ):(
-                            <h3 onClick={this.likeToggle}>
+                            <h3 onClick={likeToggle}>
                                 <i className="fa fa-thumbs-up bg-dark text-warning"
                                    style={{padding:"10px", borderRadius:"50%"}}
                                 />
@@ -142,53 +141,43 @@ class SinglePost extends Component {
                                     Update Post
                                 </Link>
                                 <button
-                                    onClick={this.deleteConfirmed}
+                                    onClick={deleteConfirmed}
                                     className="btn btn-raised btn-danger ">
                                     Delete Post
                                 </button>
                             </>
                         }
                     </div>
-
-
-
                 </div>
-
-
         )
     };
 
-    render() {
-        const {post, deleted, redirectToSignin, comments} =this.state;
-        if (deleted){
-            return <Redirect to={'/'}/>
-        }
-       else if (redirectToSignin){
-            return <Redirect to={'/signin'}/>
-        }
-        return (
-            <div className='container'>
-
-                {!post ?
-                    <h2>Loading...</h2>
-                :
-                   ( <div>
-                        <h2 className='display-2 mt-2'>{post.title}</h2>
-                        {this.renderPost(post)}
-                    </div>
-)
-                }
-                <Comment
-                    postId={post._id}
-                    comments={comments.reverse()}
-                    updateComments={this.updateComments}
-                />
-
-
-
-            </div>
-        );
+    const {post, deleted, redirectToSignin, comments} =state;
+    if (deleted){
+        return <Redirect to={'/'}/>
     }
-}
+   else if (redirectToSignin){
+        return <Redirect to={'/signin'}/>
+    }
+    return (
+        <div className='container'>
+
+            {!post ?
+                <h2>Loading...</h2>
+            :
+               ( <div>
+                    <h2 className='display-2 mt-2'>{post.title}</h2>
+                    {renderPost(post)}
+                </div>
+)
+            }
+            <Comment
+                postId={post._id}
+                comments={comments.reverse()}
+                updateComments={updateComments}
+            />
+        </div>
+    );
+};
 
 export default SinglePost;

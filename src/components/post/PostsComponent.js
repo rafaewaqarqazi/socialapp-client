@@ -1,29 +1,23 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {list} from './apiPost';
 import {Link} from "react-router-dom";
 import DefaultPost from "../../images/defaultPost.jpg";
-class PostsComponent extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            posts:[]
-        };
-    }
+const PostsComponent =props=>{
+    const [posts,setPosts] = useState([]);
 
-
-    componentDidMount() {
+    useEffect(()=>{
         list().then(data => {
             if (data.error){
                 console.log(data.error)
             }
             else {
-                this.setState({posts:data})
+                setPosts(data);
             }
         })
-    }
+    },[]);
 
-    renderPosts = posts =>{
+    const renderPosts = posts =>{
         return (
             <div className='row'>
                 {posts.map((post, i)=> {
@@ -61,27 +55,26 @@ class PostsComponent extends Component {
 
 };
 
-    render() {
-        const {posts} = this.state;
-        return (
-            <div>
-                <div className='card mb-4'>
-                    <h3 className='m-auto p-3 text-muted'>
 
-                        {!posts.length ?
-                            "Loading..."
-                        :(
-                            "Recent Posts"
-                        )}</h3>
-                </div>
-                <div className="container">
-                    {this.renderPosts(posts)}
-                </div>
 
+    return (
+        <div>
+            <div className='card mb-4'>
+                <h3 className='m-auto p-3 text-muted'>
+
+                    {!posts.length ?
+                        "Loading..."
+                    :(
+                        "Recent Posts"
+                    )}</h3>
+            </div>
+            <div className="container">
+                {renderPosts(posts)}
             </div>
 
-        );
-    }
-}
+        </div>
+
+    );
+};
 
 export default PostsComponent;
